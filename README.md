@@ -1,8 +1,6 @@
 # BaiTTS-CLI
 
-Una herramienta de línea de comandos basada en la API de **MultiTTS** para convertir documentos de texto (`.txt`) en audiolibros (`.wav`), con la opción de generar archivos de letra sincronizados en formato LRC.
-
-> **Nota:** Este proyecto está suspendido. Ahora existe [BaiTTS-CLI-rs](https://github.com/...), escrito en Rust, con mejor rendimiento y compatibilidad, uso como binario único, barra de progreso, generación de letras más inteligente y muchas más mejoras.
+Una herramienta de línea de comandos basada en la API de **MultiTTS** para consumirla y convertir documentos de texto (`.txt`) en audiolibros (`.wav`), con la opción de generar archivos de letra sincronizados en formato LRC.
 
 ## Características
 
