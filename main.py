@@ -6,10 +6,10 @@ from process import handle_list_voices, process_file, process_directory
 
 def main():
     """
-    程序主入口函数
+    Función principal de entrada del programa
     """
     if len(sys.argv) == 1:
-        print("错误：没有指定操作 (使用 -h 获取帮助)")
+        print("Error: No se especificó ninguna operación (usa -h para obtener ayuda)")
         sys.exit(1)
         
     try:
@@ -28,7 +28,7 @@ def main():
                     'speed': args.speed,
                     'pitch': args.pitch
                 },
-                lrc_max_len=args.sub, # 传递 lrc 字符数或 None
+                lrc_max_len=args.sub, # Pasar número máximo de caracteres para LRC o None
                 blacklist_source=args.blacklist
             )
         elif args.dir:
@@ -42,19 +42,19 @@ def main():
                     'speed': args.speed,
                     'pitch': args.pitch
                 },
-                lrc_max_len=args.sub, # 传递 lrc 字符数或 None
+                lrc_max_len=args.sub, # Pasar número máximo de caracteres para LRC o None
                 blacklist_source=args.blacklist
             )
-        # 如果没有匹配到任何分支 (由argparse处理，这里作为保险)
+        # Si no coincide con ninguna rama (manejado por argparse, esto es como respaldo)
         else:
-             print("错误：没有指定操作 (使用 -h 获取帮助)")
+             print("Error: No se especificó ninguna operación (usa -h para obtener ayuda)")
 
 
     except (ValueError, FileNotFoundError, ConnectionError) as e:
-        print(f"程序执行出错: {e}", file=sys.stderr)
+        print(f"Error en la ejecución del programa: {e}", file=sys.stderr)
         sys.exit(1)
     except Exception as e:
-        print(f"发生未知错误: {e}", file=sys.stderr)
+        print(f"Ocurrió un error desconocido: {e}", file=sys.stderr)
         sys.exit(1)
 
 
