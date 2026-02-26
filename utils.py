@@ -6,48 +6,48 @@ import locale
 
 def convert_file_to_utf8(file_path):
     """
-    尝试用常见编码读取文件，然后用UTF-8编码覆盖保存。
-    :param file_path: 文件路径
-    :return: True表示转换成功, False表示失败
+    Intentar leer el archivo con codificaciones comunes, luego guardar sobrescribiendo con codificación UTF-8.
+    :param file_path: Ruta del archivo
+    :return: True si la conversión fue exitosa, False si falló
     """
-    # 备选编码列表，优先使用系统默认编码，然后是中文场景常用编码
+    # Lista de codificaciones alternativas, priorizando la codificación predeterminada del sistema, luego codificaciones comunes para escenarios en chino
     encodings_to_try = [locale.getpreferredencoding(False), 'gbk', 'big5','utf16']
     
     content = None
     original_encoding = None
 
-    # 尝试用备选编码读取文件内容
+    # Intentar leer el contenido del archivo con las codificaciones alternativas
     for encoding in encodings_to_try:
         try:
             with open(file_path, 'r', encoding=encoding) as f:
                 content = f.read()
             original_encoding = encoding
-            print(f"成功使用 '{encoding}' 编码读取文件: {os.path.basename(file_path)}")
-            break # 读取成功，跳出循环
+            print(f"Lectura exitosa del archivo con codificación '{encoding}': {os.path.basename(file_path)}")
+            break # Lectura exitosa, salir del bucle
         except (UnicodeDecodeError, TypeError):
-            continue # 编码不匹配，尝试下一个
+            continue # Codificación no coincide, intentar con la siguiente
     
-    # 如果所有备选编码都失败
+    # Si todas las codificaciones alternativas fallan
     if content is None:
-        print(f"错误: 无法使用任何备选编码 ({', '.join(encodings_to_try)}) 解码文件 {os.path.basename(file_path)}。")
+        print(f"Error: No se pudo decodificar el archivo {os.path.basename(file_path)} con ninguna de las codificaciones alternativas ({', '.join(encodings_to_try)}).")
         return False
         
-    # 用UTF-8编码写回文件
+    # Escribir de vuelta al archivo con codificación UTF-8
     try:
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(content)
-        print(f"文件已成功从 '{original_encoding}' 转换为 UTF-8。")
+        print(f"El archivo ha sido convertido exitosamente de '{original_encoding}' a UTF-8.")
         return True
     except Exception as e:
-        print(f"错误: 写入UTF-8文件时失败: {e}")
+        print(f"Error: Fallo al escribir el archivo UTF-8: {e}")
         return False
 
 
 def load_blacklist_patterns(source):
     """
-    从文件、URL或字符串加载黑名单规则
-    :param source: 来源 (None, 文件路径, URL, 或带'|'的字符串)
-    :return: 正则表达式模式列表
+    Cargar reglas de lista negra desde archivo, URL o cadena
+    :param source: Origen (None, ruta de archivo, URL, o cadena con '|')
+    :return: Lista de patrones de expresiones regulares
     """
     if not source:
         return []
@@ -55,97 +55,97 @@ def load_blacklist_patterns(source):
     patterns = []
     try:
         if source.startswith(('http://', 'https://')):
-            print(f"正在从URL加载黑名单: {source}")
+            print(f"Cargando lista negra desde URL: {source}")
             response = requests.get(source)
             response.raise_for_status()
             lines = response.text.splitlines()
             patterns = [line.strip() for line in lines if line.strip()]
         elif os.path.exists(source):
-            print(f"正在从本地文件加载黑名单: {source}")
+            print(f"Cargando lista negra desde archivo local: {source}")
             with open(source, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
                 patterns = [line.strip() for line in lines if line.strip()]
         else:
-            print("将黑名单参数作为正则表达式处理")
-            # 假设是直接的正则表达式字符串
+            print("Tratando el parámetro de lista negra como expresión regular directa")
+            # Asumir que es una cadena de expresión regular directa
             patterns = [source]
     except UnicodeDecodeError:
-        print(f"警告: 黑名单文件 {source} 不是UTF-8编码，请转换后重试。将不使用黑名单。")
+        print(f"Advertencia: El archivo de lista negra {source} no está en codificación UTF-8, por favor conviértelo y reintenta. No se usará la lista negra.")
         return []
     except Exception as e:
-        print(f"警告: 加载黑名单失败: {e}。将不使用黑名单。")
+        print(f"Advertencia: Fallo al cargar la lista negra: {e}. No se usará la lista negra.")
         return []
     
-    print(f"成功加载 {len(patterns)} 条黑名单规则。")
+    print(f"Se cargaron exitosamente {len(patterns)} reglas de lista negra.")
     return patterns
 
 def apply_blacklist(text, patterns):
     """
-    将文本中匹配黑名单模式的部分用 `[[...]]` 包裹
-    :param text: 原始文本
-    :param patterns: 正则表达式模式列表
-    :return: 处理后的文本
+    Envolver las partes del texto que coincidan con patrones de la lista negra con `[[...]]`
+    :param text: Texto original
+    :param patterns: Lista de patrones de expresiones regulares
+    :return: Texto procesado
     """
     if not patterns:
         return text
         
-    # 将多个模式合并为一个，提高效率
+    # Combinar múltiples patrones en uno solo para mayor eficiencia
     combined_pattern = "|".join(patterns)
     
     try:
         return re.sub(f"({combined_pattern})", r"[[\1]]", text)
     except re.error as e:
-        print(f"警告: 黑名单正则表达式错误: {e}。该规则将被忽略。")
-        # 如果组合模式出错，可以尝试逐个应用，但这会降低性能
+        print(f"Advertencia: Error en la expresión regular de la lista negra: {e}. Esta regla será ignorada.")
+        # Si el patrón combinado falla, se pueden intentar aplicar individualmente, pero esto reducirá el rendimiento
         processed_text = text
         for pattern in patterns:
             try:
                 processed_text = re.sub(f"({pattern})", r"[[\1]]", processed_text)
             except re.error:
-                continue # 跳过错误的单个模式
+                continue # Omitir patrones individuales con errores
         return processed_text
 
 
 def split_text_for_lrc(text, max_len):
     """
-    为生成LRC将长文本切分为短句, 同时保持 [[...]] 标记的完整性。
-    每行最多 max_len 个非标点符号字符。
+    Dividir texto largo en frases cortas para generar LRC, manteniendo la integridad de las etiquetas [[...]].
+    Cada línea tendrá como máximo max_len caracteres que no sean signos de puntuación.
     """
-    # 定义标点符号集
-    punctuation = string.punctuation + "，。！？；：、…—·《》“”‘’"
+    # Definir conjunto de signos de puntuación
+    punctuation = string.punctuation + "，。！？；：、…—·《》""''"
     
-    # 正则表达式，用于分割文本，同时捕获标记作为分隔符
-    # 这会将文本分割成一个列表，其中普通文本和标记交替出现
+    # Expresión regular para dividir el texto, capturando también las etiquetas como separadores
+    # Esto dividirá el texto en una lista donde el texto normal y las etiquetas aparecen alternadamente
     segments = re.split(r'(\[\[.*?\]\])', text)
-    segments = [s for s in segments if s]  # 移除可能产生的空字符串
+    segments = [s for s in segments if s]  # Eliminar cadenas vacías que puedan generarse
 
     final_chunks = []
     current_chunk = ""
     char_count = 0
 
     for segment in segments:
-        # 如果段落是一个标记，直接附加到当前块，它不计入字符数
+        # Si el segmento es una etiqueta, agregarla directamente al bloque actual, no cuenta para el conteo de caracteres
         if segment.startswith('[[') and segment.endswith(']]'):
             current_chunk += segment
             continue
 
-        # 如果段落是普通文本，则逐字处理
+        # Si el segmento es texto normal, procesar carácter por carácter
         for char in segment:
             current_chunk += char
-            # 仅当字符不是标点或空白时，才增加计数
+            # Solo incrementar el contador cuando el carácter no sea puntuación ni espacio en blanco
             if char not in punctuation and not char.isspace():
                 char_count += 1
             
-            # 当达到最大长度时，完成当前块的分割
+            # Cuando se alcanza la longitud máxima, completar la división del bloque actual
             if char_count >= max_len:
                 final_chunks.append(current_chunk.strip())
-                # 重置当前块和计数器
+                # Reiniciar bloque actual y contador
                 current_chunk = ""
                 char_count = 0
     
-    # 循环结束后，如果当前块中还有剩余内容，将其作为最后一块
+    # Después del bucle, si aún hay contenido restante en el bloque actual, agregarlo como último bloque
     if current_chunk.strip():
         final_chunks.append(current_chunk.strip())
 
-    # 如果处理后没有任何块（例如，输入为空），则返回原始文本以避免错误
+    # Si después del procesamiento no hay bloques (por ejemplo, entrada vacía), devolver el texto original para evitar errores
     return final_chunks if final_chunks else [text]
