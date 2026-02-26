@@ -1,98 +1,93 @@
 # BaiTTS-CLI
 
-一个基于 [MultiTTS](https://t.me/MultiTTS) API 的命令行工具，用于将文本文档（.txt）转换为有声书音频（.wav），并可选择生成同步的 LRC 歌词文件。
+Una herramienta de línea de comandos basada en la API de **MultiTTS** para convertir documentos de texto (`.txt`) en audiolibros (`.wav`), con la opción de generar archivos de letra sincronizados en formato LRC.
 
-# 注意：本项目已暂停维护，现已推出使用 Rust 语言编写的 _[BaiTTS-CLI-rs](https://github.com/Doraemonsan/BaiTTS-CLI-rs)_ ：更好的性能与兼容性，二进制单文件使用更方便，还增加了进度显示和更智能的歌词生成与同步逻辑，以及更多特性，需要使用的用户请移步 _[BaiTTS-CLI-rs](https://github.com/Doraemonsan/BaiTTS-CLI-rs)_
+> **Nota:** Este proyecto está suspendido. Ahora existe [BaiTTS-CLI-rs](https://github.com/...), escrito en Rust, con mejor rendimiento y compatibilidad, uso como binario único, barra de progreso, generación de letras más inteligente y muchas más mejoras.
 
-## 功能特性
+## Características
 
-- ✅ 支持单个文本文件转语音
-- ✅ 支持批量处理文件夹中的文本文件
-- ✅ 可生成 LRC 歌词文件（支持自定义每句最大字符数）
-- ✅ 支持声音参数调节（音量、语速、音高）
-- ✅ 提供黑名单功能过滤特定内容
-- ✅ 可查询 API 支持的声音列表
+- ✅ Conversión de un archivo de texto a voz
+- ✅ Procesamiento por lotes de carpetas con archivos de texto
+- ✅ Generación de archivos LRC (con número máximo de caracteres por línea personalizable)
+- ✅ Ajuste de parámetros de voz (volumen, velocidad, tono)
+- ✅ Lista negra para filtrar contenido específico
+- ✅ Consulta de la lista de voces disponibles en la API
 
-## 安装要求
+## Requisitos de instalación
 
 - Python 3.12.11
-- 依赖：requests 2.32.4
+- Dependencias: `requests 2.32.4`
 
-## 使用方法
+## Uso
 
-### 基本语法
+### Sintaxis básica
 
 ```bash
-python main.py --api <API地址> [选项]
+python main.py --api <URL_API> [opciones]
 ```
 
-### 参数说明
+### Parámetros
 
-#### 必需参数
-- `--api`：指定调用的 API 地址（必须提供）
+**Parámetro obligatorio:**
+- `--api` — URL de la API a utilizar
 
-#### 功能模式（三选一）
-- `-l, --list`：获取并显示支持的声音列表
-- `-f, --file`：指定需要转换的单个文本文件
-- `-d, --dir`：指定需要批量处理的文件夹
+**Modo de operación (elige uno):**
+- `-l, --list` — Muestra la lista de voces disponibles
+- `-f, --file` — Especifica un archivo de texto a convertir
+- `-d, --dir` — Especifica una carpeta para procesamiento por lotes
 
-#### 输出选项
-- `-o, --out`：指定输出文件夹（默认为当前目录）
+**Opciones de salida:**
+- `-o, --out` — Carpeta de salida (por defecto: directorio actual)
 
-#### 自定义声音参数
-- `--voice`：指定发声的声音 ID （使用 `-l` 获取当前API可用声音列表）
-- `--volume`：指定音量（0-100）
-- `--speed`：指定语速（0-100）
-- `--pitch`：指定音高（0-100）
+**Parámetros de voz:**
+- `--voice` — ID de la voz a utilizar (usa `-l` para ver las disponibles)
+- `--volume` — Volumen (0–100)
+- `--speed` — Velocidad (0–100)
+- `--pitch` — Tono (0–100)
 
-#### 歌词生成
-- `-s, --sub`：为处理的文件生成 LRC 歌词文件
-  - 单独使用 `-s`：默认每句最大字符数为 15
-  - `-s <数字>`：自定义每句最大字符数（10-100）
+**Generación de letras:**
+- `-s, --sub` — Genera un archivo LRC para el archivo procesado
+  - `-s` sin argumento: máximo 15 caracteres por línea (valor por defecto)
+  - `-s <número>`: número máximo de caracteres por línea (10–100)
 
-#### 内容过滤
-- `-b, --blacklist`：指定不参与处理的黑名单字/词（支持正则表达式，可为文件、URL 或字符串，多个字词使用管道符 `|` 分割，支持正则，当输入为文件时，每行视为一个参数）
+**Filtrado de contenido:**
+- `-b, --blacklist` — Palabras o expresiones a excluir del procesamiento. Acepta expresiones regulares, puede ser una cadena de texto, archivo o URL. Separa múltiples valores con `|`. Si es un archivo, cada línea se trata como un valor independiente.
 
-### 使用示例
+## Ejemplos
 
-#### 1. 查询 API 支持的声音列表
+**1. Consultar las voces disponibles:**
 ```bash
-python script.py --api http://127.0.0.1:8774 -l
+python main.py --api http://127.0.0.1:8774 -l
 ```
 
-#### 2. 转换单个文件
+**2. Convertir un archivo:**
 ```bash
-python script.py --api http://127.0.0.1:8774 -f ./input.txt --voice voice1 -o ./output
+python main.py --api http://127.0.0.1:8774 -f ./input.txt --voice voice1 -o ./output
 ```
 
-#### 3. 批量处理文件夹并生成歌词
+**3. Procesar una carpeta y generar letras:**
 ```bash
-python script.py --api http://127.0.0.1:8774 -d ./texts --voice v2 -s 20 -o ./output
+python main.py --api http://127.0.0.1:8774 -d ./texts --voice v2 -s 20 -o ./output
 ```
 
-#### 4. 使用高级参数
+**4. Uso con parámetros avanzados:**
 ```bash
-python script.py --api http://127.0.0.1:8774 -f story.txt \
-                 --voice v3 --volume 80 --speed 90 --pitch 75 \
-                 -b "敏感词1|敏感词2" -s -o audio_output
+python main.py --api http://127.0.0.1:8774 -f story.txt \
+               --voice v3 --volume 80 --speed 90 --pitch 75 \
+               -b "palabra1|palabra2" -s -o audio_output
 ```
 
-## 注意事项
+## Notas importantes
 
-1. **参数互斥规则**：
-   - `--list`、`--file`、`--dir` 三个参数不能同时使用
-   - 使用 `--list` 时，只能配合 `--api` 参数，其他参数将被拒绝
+1. **Parámetros mutuamente excluyentes:** `--list`, `--file` y `--dir` no pueden usarse al mismo tiempo. Con `--list` solo se puede usar `--api`.
 
-2. **参数范围限制**：
-   - `--volume`、`--speed`、`--pitch`、`--sub` 使用这些参数需要 API 支持，不提供则使用默认值，超出范围的数值将导致错误
-   
-3. **黑名单功能**：
-   - 支持正则表达式匹配
-   - 可以从文件、URL 或直接字符串读取黑名单内容
+2. **Rango de valores:** `--volume`, `--speed`, `--pitch` y `--sub` requieren soporte de la API. Si no se especifican, se usan los valores por defecto. Valores fuera de rango producirán un error.
 
-## 帮助信息
+3. **Lista negra:** Admite expresiones regulares. El contenido puede cargarse desde un archivo, URL o directamente como texto.
 
-查看完整帮助：
+## Ayuda
+
 ```bash
-python script.py --api <API地址> -h
+python main.py --api <URL_API> -h
 ```
+
