@@ -1,4 +1,4 @@
-# BaiTTS-CLI
+# MultiTTS-CLI
 
 Una herramienta de línea de comandos basada en la API de **MultiTTS** para consumirla y convertir documentos de texto (`.txt`) en audiolibros (`.wav`), con la opción de generar archivos de letra sincronizados en formato LRC.
 
