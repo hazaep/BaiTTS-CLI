@@ -205,3 +205,13 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# --- MultiTTS project: local artifacts (large / generated) ---
+# APK de referencia y decompilación (fuera del repo, pin en Fase 0)
+*.apk
+tmp/
+# Audios y artefactos generados
+*.wav
+*.mp3
+# Datos volátiles de prueba
+/tmp/

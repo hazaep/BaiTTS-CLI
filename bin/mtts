@@ -1,0 +1,8 @@
+#!/bin/bash
+cd /data/data/com.termux/files/home/BaiTTS-CLI
+echo "$@" > tmp/melody.txt
+echo "$@" >> tmp/tts.log
+
+PYTHONPATH=. python3 main.py --api http://127.0.0.1:8774 -f ./bin/tmp/melody.txt --voice microsoft_es-MX-DaliaNeural-MiAndroidAccesible --volume 45 --speed 40 --pitch 27 -o tmp/melody.mp3
+
+mplayer tmp/melody.mp3
