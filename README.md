@@ -1,6 +1,11 @@
-# BaiTTS-CLI
+# mtts
 
-Una herramienta de línea de comandos basada en la API de **MultiTTS** para consumirla y convertir documentos de texto (`.txt`) en audiolibros (`.wav`), con la opción de generar archivos de letra sincronizados en formato LRC.
+Herramienta de línea de comandos basada en el servidor **MultiTTS** (puerto
+8774) para consumirlo y convertir documentos de texto (`.txt`) en audiolibros
+(`.wav`), con opción de generar subtítulos sincronizados en formato LRC.
+
+> Antes llamado *BaiTTS-CLI*. Refactorizado como paquete Python instalable
+> (`mtts`) en la Fase 1. El código heredado vive en `legacy/`.
 
 ## Características
 
@@ -9,25 +14,29 @@ Una herramienta de línea de comandos basada en la API de **MultiTTS** para cons
 - ✅ Generación de archivos LRC (con número máximo de caracteres por línea personalizable)
 - ✅ Ajuste de parámetros de voz (volumen, velocidad, tono)
 - ✅ Lista negra para filtrar contenido específico
-- ✅ Consulta de la lista de voces disponibles en la API
+- ✅ Consulta de la lista de voces disponibles en el servidor
 
-## Requisitos de instalación
+## Instalación
 
-- Python 3.12.11
-- Dependencias: `requests 2.32.4`
+```bash
+pip install -e .
+```
+
+Esto instala el comando `mtts` (y `mtts-server`, aún sin implementar — Fase 3)
+en el PATH. Requiere Python >= 3.10.
 
 ## Uso
 
 ### Sintaxis básica
 
 ```bash
-python main.py --api <URL_API> [opciones]
+mtts --backend <URL_DEL_SERVIDOR_MULTITTS> [opciones]
 ```
 
 ### Parámetros
 
 **Parámetro obligatorio:**
-- `--api` — URL de la API a utilizar
+- `--backend` — URL del servidor MultiTTS a utilizar (por defecto en local: `http://127.0.0.1:8774`)
 
 **Modo de operación (elige uno):**
 - `-l, --list` — Muestra la lista de voces disponibles
@@ -55,37 +64,45 @@ python main.py --api <URL_API> [opciones]
 
 **1. Consultar las voces disponibles:**
 ```bash
-python main.py --api http://127.0.0.1:8774 -l
+mtts --backend http://127.0.0.1:8774 -l
 ```
 
 **2. Convertir un archivo:**
 ```bash
-python main.py --api http://127.0.0.1:8774 -f ./input.txt --voice voice1 -o ./output
+mtts --backend http://127.0.0.1:8774 -f ./input.txt --voice voice1 -o ./output
 ```
 
 **3. Procesar una carpeta y generar letras:**
 ```bash
-python main.py --api http://127.0.0.1:8774 -d ./texts --voice v2 -s 20 -o ./output
+mtts --backend http://127.0.0.1:8774 -d ./texts --voice v2 -s 20 -o ./output
 ```
 
 **4. Uso con parámetros avanzados:**
 ```bash
-python main.py --api http://127.0.0.1:8774 -f story.txt \
-               --voice v3 --volume 80 --speed 90 --pitch 75 \
-               -b "palabra1|palabra2" -s -o audio_output
+mtts --backend http://127.0.0.1:8774 -f story.txt \
+     --voice v3 --volume 80 --speed 90 --pitch 75 \
+     -b "palabra1|palabra2" -s -o audio_output
 ```
+
+## Tests
+
+```bash
+pytest
+```
+
+Los tests unitarios no requieren el servidor; los de integración
+(`tests/test_integration.py`) se saltan automáticamente si el servidor
+MultiTTS no está en `127.0.0.1:8774`.
+
+## Documentación
+
+El conocimiento técnico del servidor y el diseño del proyecto están en
+[`docs/`](docs/). Índice completo en [`docs/README.md`](docs/README.md).
 
 ## Notas importantes
 
-1. **Parámetros mutuamente excluyentes:** `--list`, `--file` y `--dir` no pueden usarse al mismo tiempo. Con `--list` solo se puede usar `--api`.
+1. **Parámetros mutuamente excluyentes:** `--list`, `--file` y `--dir` no pueden usarse al mismo tiempo. Con `--list` solo se puede usar `--backend`.
 
-2. **Rango de valores:** `--volume`, `--speed`, `--pitch` y `--sub` requieren soporte de la API. Si no se especifican, se usan los valores por defecto. Valores fuera de rango producirán un error.
+2. **Rango de valores:** `--volume`, `--speed`, `--pitch` y `--sub` requieren soporte del servidor. Si no se especifican, se usan los valores por defecto. Valores fuera de rango producirán un error.
 
 3. **Lista negra:** Admite expresiones regulares. El contenido puede cargarse desde un archivo, URL o directamente como texto.
-
-## Ayuda
-
-```bash
-python main.py --api <URL_API> -h
-```
-

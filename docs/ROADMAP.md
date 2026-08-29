@@ -29,22 +29,25 @@ las extensiones propuestas por la revisión en [`ADDITIONS.md`](ADDITIONS.md).
 para documentar el `switch (path.hashCode())` exacto. Solo es necesario si el
 servidor cambia de comportamiento (ver `RISKS.md` §Mitigaciones, punto 5).
 
-## Fase 1 — Refactor a paquete instalable
+## Fase 1 — Refactor a paquete instalable ✅
 
 **Objetivo:** mantener el 100 % de la funcionalidad actual, pero en un paquete
 instalable y testeable.
 
-- [ ] `pyproject.toml` (paquete `mtts`, `requires-python = ">=3.10"`,
+- [x] `pyproject.toml` (paquete `mtts`, `requires-python = ">=3.10"`,
       entry points `mtts` y `mtts-server`).
-- [ ] Migrar `api.py`, `tts.py`, `process.py`, `lrc.py`, `utils.py` a
+- [x] Migrar `api.py`, `tts.py`, `process.py`, `lrc.py`, `utils.py` a
       `src/mtts/` con firma limpia.
-- [ ] `pip install -e .` funcional en Termux.
-- [ ] CLI `mtts` compatible con los flags actuales (`--backend -l -f -d -o
+- [x] `pip install -e .` funcional en Termux.
+- [x] CLI `mtts` compatible con los flags actuales (`--backend -l -f -d -o
       --voice --volume --speed --pitch -s -b`).
-- [ ] Tests de regresión (listar voces, convertir archivo, LRC, blacklist).
-- [ ] Verificar features contra Python 3.10 (piso de compatibilidad).
-- [ ] Wrappers `bin/mel` y `bin/mtts` reescritos como shims delgados con
+- [x] Tests de regresión (listar voces, convertir archivo, LRC, blacklist).
+- [x] Verificar features contra Python 3.10 (piso de compatibilidad).
+- [x] Wrappers `bin/mel` y `bin/mtts` reescritos como shims delgados con
       aviso de deprecación (remover en Fase 4). Ver OPEN_QUESTIONS #20.
+
+> **Nota:** el flag de la URL se renombró `--api` → `--backend` conforme a la
+> decisión confirmada en `OPEN_QUESTIONS.md` §Resumen.
 
 ## Fase 2 — Motor de diálogos (engine)
 

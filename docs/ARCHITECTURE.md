@@ -1,8 +1,49 @@
 # Arquitectura del proyecto
 
+> **Fase 1 completada (2026-08-29).** Código migrado a `src/mtts/`, legacy
+> preservado con historial en `legacy/`, paquete instalable con `pip install -e .`.
+> El resto de módulos (`audio.py`, `cache.py`, `voices.py`, `dialog/`,
+> `server/app.py`) corresponden a las Fases 2–3.
+
 Objetivo: migrar la CLI actual (un solo directorio de scripts sueltos) a un
 **paquete Python instalable y mantenible**, con un núcleo compartido entre la
 CLI y la futura API REST / dashboard.
+
+## Estado actual del layout
+
+```
+~/.bildung/multi-tts/
+├── pyproject.toml              # metadatos + entry points ✅ Fase 1
+├── README.md                   # actualizado (flag --backend)
+├── src/
+│   └── mtts/
+│       ├── __init__.py         # ✅ Fase 1
+│       ├── api.py              # ✅ Fase 1 (cliente HTTP)
+│       ├── lrc.py              # ✅ Fase 1 (generación LRC)
+│       ├── process.py          # ✅ Fase 1 (orquestación alto nivel)
+│       ├── tts.py              # ✅ Fase 1 (síntesis + combine WAV)
+│       ├── utils.py            # ✅ Fase 1 (blacklist, split, codificación)
+│       ├── cli/
+│       │   ├── __init__.py     # ✅ Fase 1
+│       │   ├── args.py         # ✅ Fase 1 (flag --backend)
+│       │   └── main.py         # ✅ Fase 1 (entry point mtts)
+│       └── server/
+│           ├── __init__.py     # ✅ Fase 1 (placeholder)
+│           └── app.py          # ✅ Fase 1 (stub Fase 3)
+├── tests/
+│   ├── test_regression.py      # ✅ Fase 1 (16 unitarios)
+│   └── test_integration.py     # ✅ Fase 1 (2 contra servidor real)
+├── bin/                        # ✅ Fase 1 (shims con deprecación)
+│   ├── mel
+│   └── mtts
+├── legacy/                     # ✅ código original sin modificar (historial)
+│   ├── api.py args.py main.py process.py tts.py lrc.py utils.py
+│   └── requirements.txt
+├── docs/                       # documentación (Fase 0)
+├── voices_es.py                # catálogo de voces ES (fuente de voices.py)
+├── tmp/                        # artefactos de referencia (fuera de git)
+└── story.txt / story.wav       # ejemplos originales
+```
 
 ## Directorio de trabajo
 

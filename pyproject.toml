@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mtts"
+version = "0.1.0"
+description = "CLI y núcleo de orquestación para el servidor MultiTTS (TTS local en puerto 8774)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "GPL-3.0-or-later" }
+authors = [
+    { name = "mtts contributors" },
+]
+dependencies = [
+    "requests~=2.32",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7",
+]
+
+[project.scripts]
+mtts = "mtts.cli.main:main"
+mtts-server = "mtts.server.app:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
