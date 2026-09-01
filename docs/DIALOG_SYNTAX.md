@@ -30,16 +30,23 @@ Todo lo que empieza con `#` (línea propia) se ignora.
 
 ```
 @nombre = ID_VOZ (opciones)
+@nombre = @preset(nombre_preset)
 ```
 
 - `ID_VOZ` = identificador real del catálogo de `/voices`
   (ej. `microsoft_es-MX-DaliaNeural-MiAndroidAccesible`).
+- `@preset(nombre_preset)` = referencia a una voz preconfigurada en el archivo
+  de config (`config.toml` → `[voices.presets]`). Hereda `speed`, `pitch`,
+  `volume` y `pause_after` del preset si están definidos. Ver `DISTRIBUTED.md`.
 - `(opciones)` = lista separada por comas, con `clave=valor`:
-  `speed`, `pitch`, `volume`, `pause_after`.
+  `speed`, `pitch`, `volume`, `pause_after`. Los valores pueden ser
+  **absolutos** (`speed=40`) o **relativos** (`speed=-10`, `volume=+5`).
+  El delta se aplica sobre el valor efectivo (preset → cast → override de línea).
 
 ```
 @narrador = microsoft_es-MX-DaliaNeural-MiAndroidAccesible (speed=40 pitch=27 volume=45 pause_after=500)
-@juan     = microsoft_es-MX-JorgeNeural-MiAndroidAccesible (speed=42 volume=48)
+@juan     = @preset(juan) (speed=+2)
+@ana      = @preset(ana)
 ```
 
 - `pause_after` (**por personaje**): silencio PCM local inyectado automáticamente
@@ -68,18 +75,27 @@ personaje (opciones): texto
 ```
 
 Cambia parámetros **solo para esa línea** (se fusionan sobre la config del
-personaje).
+personaje). Los valores aceptan sintaxis **absoluta** (`n`) o **relativa**
+(`+n` / `-n`):
 
 ```
 juan (speed=20 pitch=35): No deberías estar aquí.
+juan (speed=-10 volume=+5): Aléjate.
+narrador (pitch=+3): Era una noche...
 ```
+
+- `speed`/`pitch`/`volume` con `+n`/`-n` = delta sobre el valor efectivo
+  (preset → cast → override), con clamp a `0–100`.
+- `pause_after` con `+n`/`-n` = suma/resta de ms; sin signo = valor absoluto.
+- `n` sin signo = valor absoluto, como hasta ahora.
 
 **Regla de desambiguación (override vs acotación):** un paréntesis situado
 **entre el nombre del personaje y el `:`** es override **solo si** la clave
-está en `{speed, pitch, volume, pause_after}` y el valor es numérico.
-Cualquier otro paréntesis en esa posición —y **todos** los que van después
-del `:`— es texto hablado/acotación. Así `(velocidad=alta)` o `(raro=x)`
-nunca se interpretan como override silencioso. Ver OPEN_QUESTIONS #3.
+está en `{speed, pitch, volume, pause_after}` y el valor es numérico
+(incluyendo opcionalmente el signo `+`/`-`). Cualquier otro paréntesis en esa
+posición —y **todos** los que van después del `:`— es texto hablado/acotación.
+Así `(velocidad=alta)` o `(raro=x)` nunca se interpretan como override
+silencioso. Ver OPEN_QUESTIONS #3 y #28.
 
 ### 5. Pausa entre líneas (directiva)
 
@@ -183,18 +199,18 @@ normalidad. La sintaxis del guion (`@personaje`, `personaje:`, `[pausa N]`,
 # Ejemplo: dos personajes + narrador
 # --------------------------------------------------
 
-@narrador = microsoft_es-MX-DaliaNeural-MiAndroidAccesible (speed=40 pitch=27 volume=45 pause_after=400)
-@juan     = microsoft_es-MX-JorgeNeural-MiAndroidAccesible (speed=42 volume=48 pause_after=300)
-@ana      = vocalizer_spa-mex-paulina-high-MiAndroidAccesible (speed=38 volume=50)
+@narrador = @preset(narrador) (speed=40 pitch=27 volume=45 pause_after=400)
+@juan     = @preset(juan) (speed=42 volume=48 pause_after=300)
+@ana      = microsoft_es-MX-DaliaNeural-MiAndroidAccesible (speed=38 volume=50)
 
 narrador: Era una noche oscura y tormentosa.
 [pausa 800]
 (se escuchan truenos)
 ana: ¿Quién anda ahí? [[PAUSE:300]] ¿Eres tú, Juan?
-juan (speed=20): Sí... soy yo. No deberías estar aquí.
+juan (speed=-10): Sí... soy yo. No deberías estar aquí.
 ana: (temblando) ¿Por qué dices eso?
 [pausa 1.2s]
-narrador: Y así, sin más, la puerta se cerró.
+narrador (pitch=+3): Y así, sin más, la puerta se cerró.
 ```
 
 ---

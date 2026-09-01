@@ -72,15 +72,15 @@ Request:
 
 ```json
 {
-  "script": "narrador: Era una noche...\n[pausa 800]\njuan: Hola.",
+  "script": "narrador: Era una noche...\n[pausa 800]\njuan (speed=-10): Hola.",
   "cast": {
     "narrador": {
       "voice": "microsoft_es-MX-DaliaNeural-MiAndroidAccesible",
       "speed": 40, "pitch": 27, "volume": 45, "pause_after": 400
     },
     "juan": {
-      "voice": "microsoft_es-MX-JorgeNeural-MiAndroidAccesible",
-      "speed": 42, "volume": 48
+      "preset": "juan",
+      "speed": "+2"
     }
   },
   "format": "wav",
@@ -91,8 +91,14 @@ Request:
 ```
 
 - `script`: el guion en la sintaxis de `docs/DIALOG_SYNTAX.md`. El cast puede
-  ir inline con `@personaje = ...` o en el campo `cast` (ambos se fusionan
-  **por campo**; `cast` tiene prioridad).
+  ir inline con `@personaje = ...` o `@personaje = @preset(nombre)` o en el
+  campo `cast` (ambos se fusionan **por campo**; `cast` tiene prioridad).
+- `cast.<personaje>.preset`: referencia a una voz preconfigurada del archivo
+  de config (`config.toml`). Hereda `voice`, `speed`, `pitch`, `volume` y
+  `pause_after` del preset.
+- Los valores en `cast` y en los overrides del guion aceptan sintaxis
+  **absoluta** (`40`) o **relativa** (`"+2"`, `"-10"`). Los deltas se aplican
+  sobre el valor efectivo resuelto. Ver `DISTRIBUTED.md` §6.
 - `lrc`: si `true`, la respuesta incluye el LRC.
 - `cache`: `true` (default) o `false` (re-síntesis forzada).
 - `normalize`: `false` (default) o `true` (normalización de loudness).

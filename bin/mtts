@@ -14,8 +14,8 @@ outdir="$(mktemp -d "$tmpdir/mtts-shim.XXXXXX")"
 printf '%s\n' "$text" > "$outdir/in.txt"
 
 mtts --backend http://127.0.0.1:8774 -f "$outdir/in.txt" \
-  --voice microsoft_es-MX-DaliaNeural-MiAndroidAccesible \
-  --volume 45 --speed 40 --pitch 27 -o "$outdir"
+  --voice cereproc_Ana \
+  --volume 50 --speed 24 --pitch 52 -o "$outdir"
 
 wav="$(ls "$outdir"/*.wav 2>/dev/null | head -n 1)"
 if [ -n "$wav" ] && command -v mplayer >/dev/null 2>&1; then

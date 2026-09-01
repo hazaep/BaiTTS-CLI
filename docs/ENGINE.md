@@ -35,7 +35,10 @@ Pause(ms: int)                                  # silencio
 Control(kind: str, value: float)                # [vel N] [pitch N] [vol N]
 ```
 
-- `params` ya viene resuelto (defaults globales < cast < override línea).
+- `params` ya viene resuelto (defaults globales < preset < cast < override
+  línea). Los deltas `+n`/`-n` se aplican en el momento de la resolución
+  sobre el valor efectivo acumulado, con clamp para `speed`/`pitch`/`volume`
+  y suma sin cota para `pause_after`.
 - El texto de un `Say` ya viene **escapado** (ver abajo).
 
 ## Pipeline
@@ -82,12 +85,20 @@ mtts/
 
 ```
 1. defaults globales        (los que arrancan la sesión, o [vel]/[pitch]/[vol])
-2. cast del personaje       (voice + speed + pitch + volume + pause_after)
-3. override de línea        (nombre (speed=20): texto)
+2. preset del personaje     (@preset(nombre) → voice + speed + pitch + volume + pause_after)
+3. cast del personaje       (voice + speed + pitch + volume + pause_after)
+4. override de línea        (nombre (speed=20): texto)
 ```
 
-`voice` no tiene default global (siempre viene del cast o de la línea).
+`voice` no tiene default global (siempre viene del preset, del cast o de la línea).
 
+- **Presets:** `@preset(nombre)` carga la voz desde el archivo de config
+  (`config.toml` → `[voices.presets]`). Los valores por campo se heredan del
+  preset y pueden ser sobreescritos por el cast o la línea. Ver decisión #27.
+- **Overrides delta `+n`/`-n`:** en cualquier nivel (cast o línea), un valor
+  con signo se aplica como **delta** sobre el valor efectivo resuelto hasta
+  ese momento. `speed`/`pitch`/`volume` hacen clamp a `0–100`; `pause_after`
+  (ms) suma/resta sin cota. Ver decisión #28.
 - **Merge por campo, no por personaje:** cuando un personaje está en el cast
   JSON *y* tiene definición inline, gana el JSON campo a campo. Un JSON que
   define solo `speed` no borra el `pitch` inline. Ver OPEN_QUESTIONS #5.
@@ -220,10 +231,10 @@ Detalle y tabla completa en `docs/API.md` (sección "Escapado") y
 
 ## Tests mínimos
 
-- Parser: cast, diálogos, overrides, pausas (ms y s), acotaciones, controles.
+- Parser: cast, `@preset(nombre)`, diálogos, overrides absolutos y delta (`+n`/`-n`), pausas (ms y s), acotaciones, controles.
 - Escape: `[[PAUSE:1000]]` se conserva; `[[foo]]` se escapa; `[[PAUSE:0.5s]]`
   → warning + truncado; texto normal intacto.
-- Resolución de parámetros: prioridad global < cast < línea; merge por campo.
+- Resolución de parámetros: prioridad global < preset < cast < línea; merge por campo; deltas con clamp para `speed`/`pitch`/`volume` y suma para `pause_after`.
 - Audio: `make_silence(ms)` produce el nº correcto de frames; `concat_wav`
   produce un WAV válido (lo abre `wave`); `validate_wav()` detecta formato
   incorrecto; `normalize_loudness()` ajusta RMS con clamp.

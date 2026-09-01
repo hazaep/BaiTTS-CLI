@@ -7,9 +7,12 @@ las extensiones propuestas por la revisión en [`ADDITIONS.md`](ADDITIONS.md).
 ## Fase 0 — Consolidar conocimiento técnico ✅
 
 **Entregables:**
+
 - [x] `docs/API.md` — endpoints y parámetros del servidor MultiTTS.
 - [x] Sección de **etiquetas nativas** (`[[PAUSE:ms]]`, `<break/>`, tags
-      que se tragan) verificada empíricamente.
+  ```
+  que se tragan) verificada empíricamente.
+  ```
 - [x] Sección de **escapado** de símbolos que interfieren.
 - [x] `docs/DIALOG_SYNTAX.md` — sintaxis del guion.
 - [x] `docs/ENGINE.md` — diseño del motor de diálogos.
@@ -17,13 +20,15 @@ las extensiones propuestas por la revisión en [`ADDITIONS.md`](ADDITIONS.md).
 - [x] `docs/ROADMAP.md` — este archivo.
 - [x] `docs/OPENAPI.md` — contrato REST futuro.
 - [x] `docs/OPEN_QUESTIONS.md` — decisiones consolidadas (con respuestas).
-- [x] `docs/BURST_TEST.md` — prueba de ráfaga + escala (33/33, ~10.9× real).
+- [x] `docs/BURST_TEST.md` — prueba de ráfaga + escala (33/33, \~10.9× real).
 - [x] `docs/RISKS.md` — riesgo de drift de la APK + mitigaciones.
 - [x] `docs/ADDITIONS.md` — extensiones propuestas al plan.
 - [x] `tmp/burst_test.py` + `tmp/burst_test_output.txt` — evidencia reproducible.
-- [x] `tmp/length_test.py` — prueba de longitud por llamada (OPEN_QUESTIONS #10).
+- [x] `tmp/length_test.py` — prueba de longitud por llamada (OPEN\_QUESTIONS #10).
 - [x] Artefactos de decompilación del APK consolidados en
-      `tmp/apk/decompiled-apk-1.8.0.tar.gz` (fuera de git).
+  ```
+  `tmp/apk/decompiled-apk-1.8.0.tar.gz` (fuera de git).
+  ```
 
 **Pendiente (opcional, no bloquea nada):** re-descompilar con `--show-bad-code`
 para documentar el `switch (path.hashCode())` exacto. Solo es necesario si el
@@ -35,16 +40,24 @@ servidor cambia de comportamiento (ver `RISKS.md` §Mitigaciones, punto 5).
 instalable y testeable.
 
 - [x] `pyproject.toml` (paquete `mtts`, `requires-python = ">=3.10"`,
-      entry points `mtts` y `mtts-server`).
+  ```
+  entry points `mtts` y `mtts-server`).
+  ```
 - [x] Migrar `api.py`, `tts.py`, `process.py`, `lrc.py`, `utils.py` a
-      `src/mtts/` con firma limpia.
+  ```
+  `src/mtts/` con firma limpia.
+  ```
 - [x] `pip install -e .` funcional en Termux.
-- [x] CLI `mtts` compatible con los flags actuales (`--backend -l -f -d -o
-      --voice --volume --speed --pitch -s -b`).
+- [x] CLI `mtts` compatible con los flags actuales (\`--backend -l -f -d -o
+  ```
+  --voice --volume --speed --pitch -s -b`).
+  ```
 - [x] Tests de regresión (listar voces, convertir archivo, LRC, blacklist).
 - [x] Verificar features contra Python 3.10 (piso de compatibilidad).
 - [x] Wrappers `bin/mel` y `bin/mtts` reescritos como shims delgados con
-      aviso de deprecación (remover en Fase 4). Ver OPEN_QUESTIONS #20.
+  ```
+  aviso de deprecación (remover en Fase 4). Ver OPEN_QUESTIONS #20.
+  ```
 
 > **Nota:** el flag de la URL se renombró `--api` → `--backend` conforme a la
 > decisión confirmada en `OPEN_QUESTIONS.md` §Resumen.
@@ -54,22 +67,34 @@ instalable y testeable.
 **Objetivo:** interpretar el guion y construir audio multi-personaje.
 
 - [ ] `dialog/parser.py` — parsear cast, diálogos, overrides, pausas,
-      acotaciones, controles globales.
+  ```
+  acotaciones, controles globales.
+  ```
 - [ ] `dialog/escape.py` — escapado `[[...]]` (conservar solo `[[PAUSE:ms]]`).
 - [ ] `dialog/characters.py` — cast inline (`@`) + JSON (merge por campo).
 - [ ] `dialog/engine.py` — pipeline synth + silencio + concat.
 - [ ] `audio.py` — `make_silence`, `concat_wav`, lectura de frames.
 - [ ] **Caché de chunks por hash** (`~/.cache/mtts/<sha256>.wav`, incluye
-      versión del contrato "apk-1.8.0" en el hash). Ver `ADDITIONS.md` §1.
+  ```
+  versión del contrato "apk-1.8.0" en el hash). Ver `ADDITIONS.md` §1.
+  ```
 - [ ] **Validación de cada respuesta WAV** (cuerpo vacío, cabecera inválida
-      o formato distinto de mono/24 kHz/16-bit → error reintentable).
-      Ver `RISKS.md` §Mitigaciones, punto 3.
+  ```
+  o formato distinto de mono/24 kHz/16-bit → error reintentable).
+  Ver `RISKS.md` §Mitigaciones, punto 3.
+  ```
 - [ ] **Normalización de loudness opcional** (`--normalize`, off por defecto).
-      Ver `ADDITIONS.md` §2.
+  ```
+  Ver `ADDITIONS.md` §2.
+  ```
 - [ ] Warning de voz default (personaje fuera del cast) y de chunk largo
-      (~1 000+ caracteres). Ver OPEN_QUESTIONS #6 y #10.
+  ```
+  (~1 000+ caracteres). Ver OPEN_QUESTIONS #6 y #10.
+  ```
 - [ ] CLI: subcomando `mtts dialog` (`-f`, `-c`, `-o`, `--lrc`, `--play`,
-      `--format wav|mp3`, `--no-cache`, `--normalize`).
+  ```
+  `--format wav|mp3`, `--no-cache`, `--normalize`).
+  ```
 - [ ] **Progreso `n/N` + ETA** en `mtts dialog`. Ver `ADDITIONS.md` §3.
 - [ ] LRC por línea de diálogo (opcional).
 - [ ] Reproducción opcional (`mplayer`).
@@ -81,18 +106,26 @@ instalable y testeable.
 pensando ya en el dashboard.
 
 - [ ] `server/app.py` (FastAPI + uvicorn) con bind default `127.0.0.1`
-      (flag `--bind` para exponer). Ver `ADDITIONS.md` §5.
+  ```
+  (flag `--bind` para exponer). Ver `ADDITIONS.md` §5.
+  ```
 - [ ] `GET /health` — **canary**: alcance + síntesis corta + validación de
-      cabecera WAV (1 ch / 24 kHz / 16-bit / duración > 0). Ver `RISKS.md`.
+  ```
+  cabecera WAV (1 ch / 24 kHz / 16-bit / duración > 0). Ver `RISKS.md`.
+  ```
 - [ ] `GET /voices` — reenvío del catálogo.
 - [ ] `POST /tts` — síntesis simple (texto + params).
 - [ ] `POST /dialog` — guion + cast → audio (con `lrc: true/false`).
-- [ ] `GET /audio/{id}` — entrega de audio por URL temporal (TTL ~1 h).
-      Ver `ADDITIONS.md` §4 y `OPENAPI.md`.
+- [ ] `GET /audio/{id}` — entrega de audio por URL temporal (TTL \~1 h).
+  ```
+  Ver `ADDITIONS.md` §4 y `OPENAPI.md`.
+  ```
 - [ ] OpenAPI en `/docs` y `/openapi.json` (gratis con FastAPI).
-- [ ] Token `Bearer` opcional solo si se expone a la LAN. Ver OPEN_QUESTIONS #17.
+- [ ] Token `Bearer` opcional solo si se expone a la LAN. Ver OPEN\_QUESTIONS #17.
 - [ ] Respuesta `POST /dialog` con `lrc:true`: JSON con `audio_url` + `lrc` +
-      array `chunks` (incluye duración/params por chunk, para la ETA).
+  ```
+  array `chunks` (incluye duración/params por chunk, para la ETA).
+  ```
 
 ## Fase 4 — Dashboard sencillo (localhost)
 
@@ -113,18 +146,39 @@ pensando ya en el dashboard.
 - [ ] Plantillas/presets de personajes reutilizables.
 - [ ] Pipeline "prompt → guion (IA) → motor → audio".
 - [ ] Validación y saneado automático de guiones IA (escapado, límites de
-      longitud, voces existentes).
+  ```
+  longitud, voces existentes).
+  ```
 - [ ] Exportación multi-formato (WAV, MP3, LRC, JSON de chunks).
 
 ---
+
+## Despliegue distribuido (post-roadmap, bloqueante)
+
+Tras las Fases 2–5, el objetivo es una **imagen Docker** que corra en el
+**rpi4b** y orqueste un **nodo Android local** (APK MultiTTS en 8774). Ver
+[`DISTRIBUTED.md`](DISTRIBUTED.md).
+
+> ⚠️ **Bloqueante:** el desarrollo de la imagen Docker debe realizarse **en
+> el server rpi4b** (target `arm64v8`), no en Termux. Las decisiones #23–28
+> de [`OPEN_QUESTIONS.md`](OPEN_QUESTIONS.md) condicionan Fase 2 (engine) y
+> Fase 3 (API) para no complicar ese despliegue:
+>
+> - #23 backend como config de primera clase (env + archivo).
+> - #24 bind vs auth desacoplados.
+> - #25 cola serial + `max_concurrent`.
+> - #26 estados de salud degradados (`/health`).
+> - #27 voces preconfiguradas vs catálogo.
+> - #28 sintaxis: presets + overrides delta `+n`/`-n`.
 
 ## Notas de decisión (consolidadas)
 
 - Framework API: **FastAPI** (OpenAPI automático).
 - Formato de salida nativo: **WAV** (lo que devuelve el servidor). MP3 es
-  conversión vía `ffmpeg` (opcional).
+conversión vía `ffmpeg` (opcional).
 - Bind default **`127.0.0.1`**; exponer a LAN es opt-in con token.
 - El servidor MultiTTS (8774) es la **fuente de síntesis**; nuestra API es una
-  capa de orquestación local.
-- Rendimiento validado: **~10.9× tiempo real**, motor serial sin delay forzado
-  (`BURST_TEST.md`).
+capa de orquestación local.
+- Rendimiento validado: **\~10.9× tiempo real**, motor serial sin delay forzado
+(`BURST_TEST.md`).
+
